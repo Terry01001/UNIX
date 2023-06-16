@@ -1,0 +1,52 @@
+In this homework, you will write a cshell script to deal a specific poker
+hand, and you will write a sed script to score that hand.
+
+Here are the provided files:
+  % ls
+  PA5fulltemplate.sed  README    testeroutput.png
+  PA5sampleruns.png    allcards  testertemplate.csh
+  %
+
+  README: This is the file you are currently reading.
+
+  allcards: This is the same file as was used in the previous assignments.
+
+  testertemplate.csh: This is the same file that I posted last week. 
+
+  testeroutput.png: This image is a demo of the output of tester.csh.
+
+  PA5sampleruns.png: This image is a demo of the output of PA5.sed.
+
+  PA5fulltemplate.sed: This is the template for the sed program
+
+
+There are some rules for the assignment:
+  1. Don't cheat. You must do your own work. You cannot share code or look
+     at someone else's code. If you are caught, both students will receive
+     a 0 for the entire course.
+
+  2. Concerning the top portion of PA5fulltemplate.sed:  
+     As has been described in previous postings to the cyberuniversity, the
+     first part of the file identifies only flush and four-of-a-kind. This
+     part must use Lecture 8 syntax.
+     
+  3. Concerning the bottom portion of PA5fulltemplate.sed:  
+     This part matches all other cases, and it can use all sed syntax.
+
+  4. Concerning the "..." lines of PA5fulltemplate.sed:
+     These can be multi-line and/or can use ";".
+
+  5. Concerning the "____" lines PA5fulltemplate.sed:
+     These must be a single command. (So no ";".)
+     
+  6. Concerning the "____" lines testertemplate.csh:
+     These must be single command or command sequence. (So no unquoted ";".) 
+
+  7. Concerning the submission. You must follow these instructions exactly
+     (or else you will lose points):
+     1. Name you files "PA5.sed" and "tester.csh".
+     2. Create an empty folder named "PA5".
+     3. Copy your two "PA5.sed" and "tester.csh" files into "PA5".
+     4. Go to the parent directory of "PA5".
+     5. Run "tar -cvf PA5.tar PA5".
+     6. Submit "PA5.tar".

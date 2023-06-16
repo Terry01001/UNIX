@@ -1,0 +1,9 @@
+cd $*
+ls ??|xargs -l fgrep ../allcards -e |cut --complement -c 1-2
+ls ?D 2> /dev/null |wc -w > CountSuitFile
+ls ?H 2> /dev/null |wc -w >> CountSuitFile
+ls ?S 2> /dev/null |wc -w >> CountSuitFile
+ls ?C 2> /dev/null |wc -w >> CountSuitFile
+echo "Flush!" > Flush
+fgrep 5 CountSuitFile| paste - Flush |fgrep 5 |cut --complement -c 1-2
+rm CountSuitFile Flush

@@ -1,0 +1,16 @@
+#!/usr/bin/csh
+#set echo
+seq $1 13 52 | sort -R > topdeck
+
+set five = ( $1 `seq 13 | sort -R | head -4` )
+foreach i ( `seq 2 5` )
+   set m
+   while ( $?m )
+      unset m
+      foreach j ( `expr $i - 1 | xargs seq` )
+         if ( $five[$j] == $five[$i] ) set m
+      end
+      if ( $?m ) @ five[$i] = `seq 13 | sort -R | head -1`
+   end
+   seq $five[$i] 13 52 | sort -R | head -1 >> topdeck
+end

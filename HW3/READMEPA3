@@ -1,0 +1,193 @@
+In this homework, you will write a cshell script to deal and score a poker hand.
+
+The homework is due in two parts. Lines 1-11 are due Saturday, April 15th,
+11:59 pm. 
+
+The second part, Lines 12-end, will be due on April 24th at 11:59pm.
+
+Here are some sample runs, assuming that your program works:
+   % ./PA3.csh
+     8♦  6♠  4♣  5♣  7♣: Straight!
+   % ./PA3.csh
+     2♦  2♠  7♠  8♠  J♣: One pair!
+   % ./PA3.csh
+     4♦  5♥  7♥  3♠  6♠: Straight!
+   % ./PA3.csh
+     6♦  10♦  10♥  Q♠  Q♣: Two pair!
+   % ./PA3.csh
+     2♣  4♣  6♣  8♣  Q♣: Flush!
+   % ./PA3.csh
+     3♥  5♥  7♥  2♠  A♠: Ace high!
+   % ./PA3.csh
+     2♦  Q♦  2♠  Q♠  2♣: Full house!
+   %
+
+There are some rules for the assignment:
+You can never use ";", except with breaksw or exit (ie, ";breaksw" or ";exit").
+You can never use "||", except on Line #8 (the card display line, see below).
+You can never use "&&".
+You can never create any files.
+You must complete each line listed below in a single line of your script.
+
+
+The line-by-line description is now described, and must be obeyed:
+
+Line 1:  #!/usr/bin/tcsh
+         (In your computer, it might be #!/bin/tcsh.)
+	 
+Line 2: This creates an array of 13 zeroes (ie, '0').
+        There are are 13 card faces (2 - 10, J, Q, K, and A).
+	This array will be used to count how many of each face are seen.
+
+Line 3: This creates an array of 4 zeroes (ie, '0').
+        There are are 13 card suits (♦, ♥, ♠, and ♣).
+	This array will be used to count how many of each suit are seen.
+
+Line 4: This creates an array of 4 elements, with the values ♦, ♥, ♠, and ♣.
+
+Line 5: This starts a foreach loop, with a loop index variable of "i".
+        It loops over 5 distinct random numbers that are between 0 and 51.
+	These numbers must be sorted from smallest to largest.
+        This line's implementation must meaningfully use ``, seq, and sort (it
+	can also use other things).
+	(Hint: sort has -R flag).
+
+Line 6: This uses the following idea: If "i" is a number between 0 and 51, then
+        i/13 will be a number between 0 and 3. (Note that expr will return a
+	rounded-down integer for "/", just like C would do.)
+	The purpose of all of this is to create an index to access the elements
+	of the array created on line 3. And that array is a Cshell array, which
+	means that the indexing starts at 1 (ie, not at 0 as it would in C).
+
+        Q. So, what does it all mean?
+	A. Line 6 defines a variable that holds the number 1+i/13.
+           Note: You must use Cshell's @ command.
+	   Also, in Cshell, always remember to add spaces between things.
+
+Line 7: This uses the idea that i%13 will be a number between 0 and 12 (which
+        indicates 13 different values, just like there are 13 cards per suit).
+	Also, a trick on Line 8 will be easier if we add a 1 to the answer.
+
+        Q. So, what does it all mean?
+	A. Line 7 defines a variable that holds the number 1+i%13.
+
+
+Line 8: This line prints the card. It does not use color (unlike the earlier
+        homeworks). It has this format:
+           echo -n \  `echo  _1_ | grep _2_ | cut _3_ | tr _4_ || expr _5_`$_6_
+
+           where:
+	     _1_: This is the variable created on Line 7.
+	     _2_: This SINGLE regular expression matches to numbers 10 to 13 (it
+	          may also match numbers like 14-19 if you want it to, because
+		  such numbers are not valid inputs anyway.)
+             _3_: Since the grep must have matched, in order to reach here, we
+	          must have a 2-digit number beginning with 1. This cut command
+		  is now used to remove the leading "1". (Note, we couldn't just
+		  do "tr -d 1", because then a number "11" would've become "".)
+             _4_: This turns a 0 into a  J, 1 into Q, 2 into K, and 3 into A.
+	     _5_: Note that this is preceded by a "||", not a "|". That means
+	          that _5_ only executes if _3_ did NOT find a match. From this,
+		  we can know, in reaching _5_, that the variable defined back
+		  on line 7 holds a 1-digit number.
+		  That 1-digit number is valued from 1 to 9, but the numbered
+		  cards in a deck from 2 to 10.
+		  Therefore, the job of _5_ is to add one to the variable
+		  defined on line 7. (Note it re-accesses the variable, it does
+		  not read input from the pipe.)
+	     _6_: Parts _1_-_5_ have printed the face, so _6_ prints the suit by
+	          accessing the correct element of the array created on line 4.
+		  
+Line 9:  This line adds 1 to the appropriate element of the array thay you had
+         created on Line 2, based on what the face value of the current card is.
+	 Note, you must use @.
+
+Line 10: This line adds 1 to the appropriate element of the array thay you had
+         created on Line 3, based on what the suit value of the current card is.
+	 Note, you must use @.
+
+Line 11: end    <= Write this as-is. It ends the loop that you bagan on line 5.
+
+Line 12: echo -n ": " <= Write this as-is.
+
+Line 13: switch ( `_1_ | _2_ | _3_ | _4_` )
+         _1_ Print all of the elements of the array updated on Line 9.
+	 _2_ Put each element on its own line.
+	 _3_ Sort them so that the bigger numbers are at the top.
+	 _4_ Erase all zeroes and newlines. This will create one of six cases,
+	     which you will deal with as follows:
+
+Lines 14-24: Copy the following lines, as-is:   
+    case 41:
+        echo Four of a kind! ;breaksw
+    case 32:
+        echo Full house! ;breaksw
+    case 311:
+        echo Three of a kind! ;breaksw
+    case 221:
+        echo Two pair! ;breaksw
+    case 2111:
+        echo One pair! ;breaksw
+    case 11111:
+
+
+Line 25: To reach this line, the face cards must be all different.
+         But there are 4 possible situations for this:
+	   - A flush, meaning that all cards are the same suit.
+	   - A straight, meaning that the cards are in sequence. (A special
+	     case of this is when the Ace is below a 2-5 sequence.)
+	   - A straight flush, when both of the above are true.
+	   - A junk hand. In this case, the score is based on what the highest
+	     card is.
+
+         Now that I understand what the students' questions about this line were,
+	   My answer is: This Line 25 can be left blank.
+              
+Line 26:set flush = "" <= Write this as-is.
+
+Line 27: if ( __1__ ) set flush = \ Flush!
+         Note that this line uses Cshell's 1-line if (that doesn't get a "then")
+         The details of __1__ are up to you. Its purpose is to see if there
+	 is a "5" in the array that you updated on Line 10.
+
+         Note: the reason the we created a variable that may-or-may-not contain
+	       the string "Flush!" is because we must handle straight flushes.
+
+Lines 28-29:
+        if ( `__1__`  =~ '__2__' ) then
+            echo Straight$flush!
+	    
+        __1__: Print all of the elements of the array updated on Line 9.
+	__2__: A wildcard pattern that matches to a sequence of 5 straight 1s.
+               Note: this is a wilcard pattern. Wildcard patterns default to
+	             matching the whole string, which is not what you want.
+		 
+Lines 30-31:
+        else if ( `__1__`  == '1 1 1 1 1' ) then
+            echo Straight$flush!
+
+        __1__: This is for handling the special case where that sequence is
+	       A, 2, 3, 4, 5. In this case ,we can just list those array
+	       elements, and see if they are all 1.
+
+Lines 32-34: (Copy these lines as-is)
+        else if ( $flush != "" ) then
+	    echo Flush!
+        else
+
+Line 35: This line must use a foreach, and an seq to count down from 13 to 1. 
+
+Line 36: if ( __1__ ) then
+
+         This line checks array of face values (the one you update on line 9)
+         to see if the count down counter has reached a card that you have.
+         
+Lines 37 to end-5: These lines are a switch block to print what the high card's
+                   name is. Eg Ace high!, or Queen high, or 10 high!, or 7 high!
+
+Lines end-5 to end: (Copy as-is)
+		    endsw
+		endif
+	    end
+	endif
+endsw

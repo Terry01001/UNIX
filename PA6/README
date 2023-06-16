@@ -1,0 +1,250 @@
+
+Let's look at the provided files:
+    % ls
+    DatabaseAndLogExpected                   README
+    QuantumQuest:_A_ChatGPT_Space_Adventure  testawk.sh
+    %
+
+Also, you can see that I have given you an Expected output file.
+
+And I have given you a test script to check your answer with.
+
+Aside from this README file, there one more file, a big text file:
+    % wc -c QuantumQuest:_A_ChatGPT_Space_Adventure
+      206634 QuantumQuest:_A_ChatGPT_Space_Adventure
+    %
+
+Q1. What is this huge, 200KB file?
+A1. It is a copy of a chat session I had with ChatGPT.
+
+Q2. Why am I showing it to you:
+A2a.Because I have been trying to convince you, all semester long,
+    that plain text files are important. And now there is chatGPT.
+    How do you interact with it? Oh, that's right: in plain text.
+    So it is a good use case for the demonstrating the value of
+    tools for working on text files.
+A2b.Because I am trying to wake students up to the need to learn
+    ChatGPT for programming. (In fact I will be teaching a class
+    on that topic in the coming fall semester, on Monday afternoons.
+    Just letting you know, in case you may be interested.)
+    Reading the QuantumQuest:_A_ChatGPT_Space_Adventure file
+    will show something about what ChatGPT does well, and where it
+    makes mistakes.
+A2c.Because the output of ChatGPT was, in this case, pretty good.
+    However, it needs to be cleaned up a little. And that is just
+    what a tool like awk is good at.
+
+Q3. So, what will you see if you read the chat file?
+A3. It is a record of my conversation with ChatGPT, in planning how
+    to design a text adventure game. NOTE: you do not need to read
+    all of the file in order to do this assignment, but I gave you
+    the full file just to show you what ChatGPT can do.
+
+But, to spare you the reading of the full file (in case you are not
+interested to read it), I started out talking to ChatGPT about what
+puzzle I can put into the game. Eventually, through discussing with
+ChatGPT, I settled on a puzzle where my spaceship has encountered
+an alien artifact with quantum entanglement properties that lead to
+a puzzle the player will need to solve. The solution will involve
+using the quantum stabilizer unit (QSU) of the quantum computer that
+is onboard my spaceship. In deciding how the player can figure out
+the puzzle, I ended up with the idea that the player will have access
+to the ship's computer records. And that is where we get to the
+homework assignment:
+
+At some point in the conversation with ChatGPT, I began asking it
+to generate database entries for a variety of topics.
+I also asked it generate some Captain's Log Entries.
+
+We can see what those entries are by looking at just the Entry Names
+in the provided DatabaseAndLogExpected file:
+    % grep '^[CD]a.* [LE]' DatabaseAndLogExpected|sort
+    Captain's Log - Mission Day 113, Supplemental 2:
+    Captain's Log - Mission Day 113, Supplemental:
+    Captain's Log - Mission Day 113:
+    Captain's Log - Mission Day 1:
+    Captain's Log - Mission Day 2:
+    Database Entry: Command and Control System:
+    Database Entry: Communication System:
+    Database Entry: Crew Manifest:
+    Database Entry: Current Mission:
+    Database Entry: Deep Space Hibernation:
+    Database Entry: Dilithium:
+    Database Entry: Environmental Monitoring System:
+    Database Entry: Life Support System:
+    Database Entry: Navigation and Guidance System:
+    Database Entry: Nexus Prime:
+    Database Entry: Nova Lumen:
+    Database Entry: Payload Systems:
+    Database Entry: Power Generation and Distribution:
+    Database Entry: Propulsion System:
+    Database Entry: QuantaCore Q-7000:
+    Database Entry: Quantum Computing:
+    Database Entry: Quantum Data Processor (QDP):
+    Database Entry: Quantum Encryption and Communication (QEC):
+    Database Entry: Quantum Entanglement:
+    Database Entry: Quantum Resource Allocation (QRA):
+    Database Entry: Quantum Sensor Integration (QSI):
+    Database Entry: Quantum Stabilizer Unit (QSU):
+    Database Entry: Ship Systems:
+    Database Entry: Weapons System:
+    %
+
+The idea of the database file is that I can easily have chatGPT write
+code to display individual entries. For example, here is how easy it
+is to display a specific entry in sed:
+    % cat DatabaseAndLogExpected | sed -n '/Weapons/,/--/p;1i\\t'
+
+    Database Entry: Weapons System:
+    Although primarily designed for peaceful trading operations, the trading barge is equipped with a basic defensive weapons system. The system features lightweight plasma pulse emitters capable of emitting controlled bursts of energy to repel potential threats. Its primary purpose is to provide a deterrent and basic defense capability against minor spaceborne hazards or rogue elements encountered during trade missions. The weapons system is supported by a simple deflector shield system that provides a limited level of protection to the ship.
+    
+    ------------------------
+    %
+
+
+Well, that is nice, cleaned-up output from DatabaseAndLogExpected.
+
+The problem is that ChatGPT's output was less-clean in several ways:
+  1) It has a few inconsistencies in format that need to be fixed,
+     for a small number of entries.
+  2) It has lines of text that are not database entries.
+  3) It has duplicate entries. This is because I would sometimes
+     tell it to try again. So, when there are duplicates, the one
+     that appears later in the file wins. (One exception to this is
+     the 8 ship systems: Command and Control, Communication,
+     Environmental Monitoring, Life Support, Navigation and Guidance,
+     Payload, Power Generation and Distribution, and Propulsion. For
+     these systems, the earlier description is better than the later
+     one -- but that won't matter, because the later ones end up
+     getting skipped anyway because their format is different.)
+
+So the job of your awk script is to clean up the chatGPT output.
+
+To begin understanding how we will do that, let's look at the script
+I gave you for testing:
+     % cat testawk.sh
+     cat QuantumQuest:_A_ChatGPT_Space_Adventure | \
+         awk -f PA6.awk | uniq | \
+         sed 's/[[]Insert Ship Name]/Fortune Céleste/'>DatabaseAndLog
+     
+     sort DatabaseAndLog > sortedDatabaseAndLog
+     sort DatabaseAndLogExpected > sortedDatabaseAndLogExpected
+     echo
+     diff -q sortedDatabaseAndLogExpected sortedDatabaseAndLog && \
+          echo Matches\! || echo doesn\'t match\!
+     echo
+     rm -f sortedDatabaseAndLog sortedDatabaseAndLogExpected
+     %
+
+From the above see that if first does this:
+     cat QuantumQuest:_A_ChatGPT_Space_Adventure | awk -f PA6.awk|...
+
+So your PA6 soultion is an awk script that runs directly on the
+QuantumQuest:_A_ChatGPT_Space_Adventure file.
+
+
+Next, we notice that the PA6,awk output gets a little more clean-up:
+         ...
+         awk -f PA6.awk | uniq | \
+         sed 's/[[]Insert Ship Name]/Fortune Céleste/'>DatabaseAndLog
+
+The uniq command removes duplicate lines. The only time that this
+output will have duplicate lines is for empty lines. So this uniq is
+just limitting gaps between paragraphs to only single empty lines.
+
+Next, a sed command inserts the spaceship's name, because the ship's
+name was not yet known at the time that the database entry that says
+"[Insert Ship Name]" was written. Don't understand? Then forget about
+it, because it is not something you need to worry about-- I already
+gave you the tester.sh script that uses sed to fix it, as you see
+above.
+
+Now let's look at the rest of the test script:
+     % tail -8 testawk.sh
+     
+     sort DatabaseAndLog > sortedDatabaseAndLog
+     sort DatabaseAndLogExpected > sortedDatabaseAndLogExpected
+     echo
+     diff -q sortedDatabaseAndLogExpected sortedDatabaseAndLog && \
+          echo Matches\! || echo doesn\'t match\!
+     echo
+     rm -f sortedDatabaseAndLog sortedDatabaseAndLogExpected
+     %
+
+Here we see that it just compares your output to the expected output.
+But we do see that it sorts the outputs before comparing them. This is
+because the individual entries may not list in the same order on every
+computer system (and that is OK, the database entries are unordered).
+
+
+
+OK. So now, how to implement PA6.awk?
+
+First, I will clarify: you want to use an associative array, named DB.
+The index is the "Database Entry: ..." line. The value inside of the
+associative array is the description text for that Entry. Then, when you
+reach the END, the array gets printed.
+ Q. Why create an array named DB?
+ A. Because we need to only use the final entry when there are duplicates
+    (the earlier array value will get overwritten by a later value). 
+
+
+Now here is the line-by-line:
+
+Line 1. This defines DE="Database Entry: ". It must do this only 1 time,
+        at the beginning of execution.
+
+Line 2. This uses the next() function to skip over this input line, if the
+        line begins with "End of". Why? because ChatGPT sometimes generated 
+        a useless "End of Database Entry" line.
+
+Line 3. The database entry for Dylithium is a little-bit wrongly formatted:
+           % cat QuantumQuest:_A_ChatGPT_Space_Adventure | sed -n 448p
+           Ship's Database - Dilithium
+           %
+         Line 3 changes it into: "Database Entry: Dilithium:"
+
+Line 4. The database for the hybernation and weapons systems are illformated:
+           % cat QuantumQuest\:_A_ChatGPT_Space_Adventure| sed -n '987,989p' |\
+           ? sed 's/\(.\{60\}\).*/\1.../'
+           Deep Space Hibernation: The deep space hibernation system al...
+           
+           Weapons System: Although primarily designed for peaceful tra...
+           %
+
+        They should instead be: "Database Entry: Deep Space Hibernation" and
+        "Database Entry: Weapons Systems".
+        But there is another issue: The text for those two database entries
+        are placed on the same line, rather than on the next line (see above,
+        the words "The deep space hibernation system al...").
+
+        So, how to do line 4?
+        1. You need a pattern that catches both the hibernation and weapons
+           systems. 
+        2. You need to use split() to separate the line by the ": " symbol,
+           and placing it the result into array A.
+        3. You need to set the array element for those systems. That is to say:
+           The index for the DB array is A[1] and the value is A[2]"\n".
+	
+Line 5. This converts "Log, Day 113" to "Log - Mission Day 113".
+
+Line 6. This converts ", Supplemental" to " - Mission Day 113, Supplemental".
+
+Line 7. The Pattern catches the lines that begin "Database" or "Captain's Log".
+       -One Action is to create a variable, K, that is set to $0. That variable
+        will become the SB index.
+       -Another action is to create an entry in DB with an index of K and a
+        value of "". (Why empty? Because the DB contents are in the next line.)
+       -Finally, there is one more part of the action. It uses getline, to put
+        the next line into $0.
+
+Line 8. The pattern is lines that begin with "User".
+        The action is to set the K value to "".
+        Why? Because the line with "User" indicates that ChatGPT finished.
+
+Line 9. The pattern is to check whether K is not "".
+        The action is to append a "\n"$0 into DB[K].
+
+LINE 10.The pattern is END.
+        The action is to use a for loop to print all of the elements of DB.
+	After each, you also print "------------------------".
